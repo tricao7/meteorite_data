@@ -1,0 +1,110 @@
+---
+title: "data363_finalproject"
+output:
+  word_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, results = 'hide')
+library(ggplot2)
+library(ggmap)
+library(sp)
+library(maps)
+library(rworldmap)
+```
+
+```{r Dataframe}
+options(max.print=976257)
+meteor = read.csv('Meteorite-landings.csv')
+meteor = meteor[complete.cases(meteor[,5:9]),]
+coordinates = data.frame(lon = c(meteor$reclong), lat = c(meteor$reclat))
+```
+
+```{r Coordinates to Country Function}
+
+coords2country = function(points)
+{  
+  countriesSP <- getMap(resolution='low')
+  #countriesSP <- getMap(resolution='high') #you could use high res map from rworldxtra if you were concerned about detail
+
+  # convert our list of points to a SpatialPoints object
+
+  # pointsSP = SpatialPoints(points, proj4string=CRS(" +proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs +towgs84=0,0,0"))
+
+  #setting CRS directly to that from rworldmap
+  pointsSP = SpatialPoints(points, proj4string=CRS(proj4string(countriesSP)))
+  #mass = points$mass..g.
+
+  # use 'over' to get indices of the Polygons object containing each point 
+  indices = over(pointsSP, countriesSP)
+  
+  # return the ADMIN names of each country
+  #indices$ADMIN  
+  #indices$ISO3 # returns the ISO3 code 
+  #indices$continent   # returns the continent (6 continent model)
+  #indices$REGION   # returns the continent (7 continent model)
+  #coords <- coords2country(coordinates)
+indices$mass <- meteor$mass..g.
+indices[order(indices$REGION),]
+}
+```
+
+```{r Continent Frequencies}
+coords <- coords2country(coordinates)
+table(coords$REGION)
+```
+
+```{r Continent Mass and STD}
+africa_index <- c(grep('Africa', coords$REGION))
+africa_mass <- coords[africa_index,-1]
+africa_mean <- mean(africa_mass$mass)/1000
+africa_sd <- sd(africa_mass$mass)/1000
+
+
+antarctica_index <- c(grep('Antarctica', coords$REGION))
+antarctica_mass <- coords[antarctica_index,-1]
+antarctica_mean <- mean(antarctica_mass$mass)/1000
+antarctica_sd <- sd(antarctica_mass$mass)/1000
+
+asia_index <- c(grep('Asia', coords$REGION))
+asia_mass <- coords[asia_index,-1]
+asia_mean <- mean(asia_mass$mass)/1000
+asia_sd <- sd(asia_mass$mass)/1000
+
+australia_index <- c(grep('Australia', coords$REGION))
+australia_mass <- coords[australia_index,-1]
+australia_mean <- mean(australia_mass$mass)/1000
+australia_sd <- sd(australia_mass$mass)/1000
+
+europe_index <- c(grep('Europe', coords$REGION))
+europe_mass <- coords[europe_index,-1]
+europe_mean <- mean(europe_mass$mass)/1000
+europe_sd <- sd(europe_mass$mass)/1000
+
+north_america_index <- c(grep('North America', coords$REGION))
+north_america_mass <- coords[north_america_index,-1]
+north_america_mean <- mean(north_america_mass$mass)/1000
+north_america_sd <- sd(north_america_mass$mass)/1000
+
+south_america_index <- c(grep('South America', coords$REGION))
+south_america_mass <- coords[south_america_index,-1]
+south_america_mean <- mean(south_america_mass$mass)/1000
+south_america_sd <- sd(south_america_mass$mass)/1000
+```
+
+```{r pressure, echo=FALSE, results="markup"}
+#plot of latitiude
+ggplot(data = meteor['reclat'], aes(x = reclat)) + geom_histogram(binwidth = 2, fill = 'lightblue', color = 'Black') + labs(title = 'Latitude of Meteor Found', x = 'Latitude', y = 'Frequency')
+
+#plot of longitude
+ggplot(data = meteor['reclong'], aes(x = reclong)) + geom_histogram(binwidth = 5, fill = 'lightblue', color = 'Black') + labs(title = 'Longitude of Meteor Found', x = 'Longitude', y = 'Frequency')
+```
+
+```{r p val}
+pf(65.23, 6, 32011, lower.tail = FALSE) #p-value for the ANOVA Test
+
+pt(-7.395, 32011, lower.tail = TRUE)*2 #p-value for the contrast test statistic
+```
+
+
