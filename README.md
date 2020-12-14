@@ -6,6 +6,6 @@ meteorite strikes. I have done an Analysis of Variance test (ANOVA test) and a C
 the question at hand.
 
 Included in this repository:
-Meteorite-Landings.csv: the csv file that contains the data about the meteorites.
-final_report.docx: this is the written report of the statistical analysis that was preformed.
-final_project.RMD: this is the rmd file with the code that was used to create the final report.
+1) Meteorite-Landings.csv: the csv file that contains the data about the meteorites.
+2) final_report.docx: this is the written report of the statistical analysis that was preformed.
+3) final_project.RMD: this is the rmd file with the code that was used to create the final report.
